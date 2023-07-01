@@ -43,6 +43,11 @@ func (r *Repository) loadStashedItems() error {
 		}
 		// find branch
 		stashBranchRegexMatch := stashBranchRegex.FindString(trimmed)
+		if len(stashBranchRegexMatch) < 2 {
+			// probably something isn't right let's continue over this iteration
+			continue
+		}
+
 		branchName := stashBranchRegexMatch[:len(stashBranchRegexMatch)-2]
 
 		branchMatches := stashMsgRegex.FindStringSubmatch(branchName)
