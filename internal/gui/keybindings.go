@@ -322,6 +322,14 @@ func (gui *Gui) generateKeybindings() error {
 			Vital:       false,
 		}, {
 			View:        mainViewFeature.Name,
+			Key:         'a',
+			Modifier:    gocui.ModNone,
+			Handler:     gui.markAllRepositories,
+			Display:     "a",
+			Description: "Select All",
+			Vital:       false,
+		}, {
+			View:        mainViewFeature.Name,
 			Key:         gocui.KeyBackspace2,
 			Modifier:    gocui.ModNone,
 			Handler:     gui.unmarkAllRepositories,
