@@ -60,7 +60,7 @@ type RepositoryDecorationRules struct {
 // repository render rules
 func (gui *Gui) renderRules() *RepositoryDecorationRules {
 	rules := &RepositoryDecorationRules{
-		MaxBranch: 15,
+		MaxBranch: 30,
 		MaxName:   30,
 	}
 
@@ -136,6 +136,12 @@ func renderRevCount(r *git.Repository, rule *RepositoryDecorationRules) string {
 	if b.Pushables != "?" {
 		n1, part1 := align(b.Pushables, rule.MaxPushables, false)
 		n2, part2 := align(b.Pullables, rule.MaxPullables, false)
+		if n1 > 0 {
+			part1 = yellow.Sprint(part1)
+		}
+		if n2 > 0 {
+			part2 = yellow.Sprint(part2)
+		}
 		revCount = blue.Sprint(pushable) + ws + strings.Repeat(" ", n1) + part1 +
 			ws + blue.Sprint(pullable) + ws + strings.Repeat(" ", n2) + part2
 	} else {
