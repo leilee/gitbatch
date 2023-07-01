@@ -45,15 +45,19 @@ func (gui *Gui) cursorDown(g *gocui.Gui, v *gocui.View) error {
 		ox, oy := v.Origin()
 		ly := len(gui.State.Repositories) - 1
 
-		// if we are at the end we just return
 		if cy+oy == ly {
-			return nil
-		}
-		if err := v.SetCursor(cx, cy+1); err != nil {
-			if err := v.SetOrigin(ox, oy+1); err != nil {
-				return err
+			// if we are at the bottom of the view, go to the top
+			_ = v.SetOrigin(ox, 0)
+			_ = v.SetCursor(cx, 0)
+		} else {
+			// otherwise just go down
+			if err := v.SetCursor(cx, cy+1); err != nil {
+				if err := v.SetOrigin(ox, oy+1); err != nil {
+					return err
+				}
 			}
 		}
+
 	}
 	return gui.renderMain()
 }
@@ -63,9 +67,20 @@ func (gui *Gui) cursorUp(g *gocui.Gui, v *gocui.View) error {
 	if v != nil {
 		ox, oy := v.Origin()
 		cx, cy := v.Cursor()
-		if err := v.SetCursor(cx, cy-1); err != nil && oy > 0 {
-			if err := v.SetOrigin(ox, oy-1); err != nil {
-				return err
+
+		if (cy + oy) == 0 {
+			// if we are at the top of the view, go to the bottom
+			ly := len(gui.State.Repositories) - 1
+			_, sy := v.Size()
+			cy := minInt(sy-1, ly)
+			_ = v.SetOrigin(ox, ly-cy)
+			_ = v.SetCursor(cx, cy)
+		} else {
+			// otherwise just go up
+			if err := v.SetCursor(cx, cy-1); err != nil && oy > 0 {
+				if err := v.SetOrigin(ox, oy-1); err != nil {
+					return err
+				}
 			}
 		}
 	}
@@ -314,4 +329,11 @@ func (gui *Gui) sortByMod(g *gocui.Gui, v *gocui.View) error {
 	sort.Sort(git.LastModified(gui.State.Repositories))
 	_ = gui.renderMain()
 	return nil
+}
+
+func minInt(a, b int) int {
+	if a < b {
+		return a
+	}
+	return b
 }
